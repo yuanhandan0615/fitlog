@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FitLog - 力量训练记录</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 导航栏 -->
+        <nav class="nav-bar">
+            <div class="nav-brand">FitLog</div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-page="dashboard">首页</button>
+                <button class="nav-tab" data-page="plans">计划</button>
+                <button class="nav-tab" data-page="history">历史</button>
+                <button class="nav-tab" data-page="analytics">分析</button>
+                <button class="nav-tab" data-page="settings">设置</button>
+            </div>
+        </nav>
+
+        <!-- 页面容器 -->
+        <main class="main-content">
+            <!-- 首页/仪表盘 -->
+            <section id="dashboard-page" class="page active">
+                <div class="dashboard-header">
+                    <h1>训练仪表盘</h1>
+                    <p class="subtitle">记录每一次进步</p>
+                </div>
+
+                <div class="quick-start">
+                    <h2>快速开始</h2>
+                    <div id="quick-plans" class="plan-cards">
+                        <p class="empty-state">暂无训练计划，先去"计划"页面创建吧</p>
+                    </div>
+                </div>
+
+                <div class="stats-overview">
+                    <h2>本周概览</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="week-workouts">0</div>
+                            <div class="stat-label">训练次数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="week-volume">0</div>
+                            <div class="stat-label">总容量 (kg)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="week-sets">0</div>
+                            <div class="stat-label">总组数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="week-prs">0</div>
+                            <div class="stat-label">新 PR</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-prs">
+                    <h2>最近 PR</h2>
+                    <div id="recent-prs-list">
+                        <p class="empty-state">还没有记录，开始训练吧！</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 计划管理页 -->
+            <section id="plans-page" class="page">
+                <div class="page-header">
+                    <h1>训练计划</h1>
+                    <button class="btn btn-primary" id="btn-new-plan">+ 新建计划</button>
+                </div>
+                <div id="plans-list" class="plans-list">
+                    <p class="empty-state">还没有训练计划</p>
+                </div>
+            </section>
+
+            <!-- 训练记录页 -->
+            <section id="workout-page" class="page">
+                <div class="workout-header">
+                    <button class="btn btn-text" id="btn-cancel-workout">取消</button>
+                    <h1 id="workout-plan-name">训练</h1>
+                    <div class="workout-timer" id="workout-timer">00:00</div>
+                </div>
+                <div id="workout-exercises" class="workout-exercises"></div>
+                <div class="workout-actions">
+                    <button class="btn btn-primary btn-large" id="btn-finish-workout">完成训练</button>
+                </div>
+            </section>
+
+            <!-- 历史页 -->
+            <section id="history-page" class="page">
+                <div class="page-header">
+                    <h1>训练历史</h1>
+                </div>
+                <div id="history-list" class="history-list">
+                    <p class="empty-state">还没有训练记录</p>
+                </div>
+            </section>
+
+            <!-- 分析页 -->
+            <section id="analytics-page" class="page">
+                <div class="page-header">
+                    <h1>进步分析</h1>
+                </div>
+                <div class="analytics-controls">
+                    <select id="analytics-exercise" class="form-select">
+                        <option value="">选择动作</option>
+                    </select>
+                    <div class="chart-type-toggle">
+                        <button class="btn btn-sm active" data-chart="weight">重量</button>
+                        <button class="btn btn-sm" data-chart="volume">容量</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="progress-chart"></canvas>
+                </div>
+                <div id="exercise-stats" class="exercise-stats"></div>
+            </section>
+
+            <!-- 设置页 -->
+            <section id="settings-page" class="page">
+                <div class="page-header">
+                    <h1>设置</h1>
+                </div>
+                <div class="settings-section">
+                    <h3>数据管理</h3>
+                    <div class="settings-actions">
+                        <button class="btn btn-secondary" id="btn-export">导出数据 (JSON)</button>
+                        <button class="btn btn-secondary" id="btn-import">导入数据</button>
+                        <input type="file" id="import-file" accept=".json" hidden>
+                        <button class="btn btn-danger" id="btn-clear">清空所有数据</button>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>训练设置</h3>
+                    <div class="form-group">
+                        <label>默认休息时长（秒）</label>
+                        <input type="number" id="rest-timer-default" class="form-input" value="90" min="10" max="600">
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>关于</h3>
+                    <p>FitLog v1.0 - 个人力量训练记录工具</p>
+                    <p>数据存储在本地浏览器中</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- 休息计时器弹窗 -->
+        <div id="rest-timer-modal" class="modal hidden">
+            <div class="modal-content rest-timer-content">
+                <div class="rest-timer-display" id="rest-timer-display">01:30</div>
+                <div class="rest-timer-controls">
+                    <button class="btn btn-secondary" id="btn-timer-add-30">+30秒</button>
+                    <button class="btn btn-primary" id="btn-timer-done">完成</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新建/编辑计划弹窗 -->
+        <div id="plan-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="plan-modal-title">新建计划</h2>
+                    <button class="btn btn-text modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>计划名称</label>
+                        <input type="text" id="plan-name" class="form-input" placeholder="如：推日、拉日、腿日">
+                    </div>
+                    <div class="form-group">
+                        <label>动作列表</label>
+                        <div id="plan-exercises" class="plan-exercises-edit"></div>
+                        <button class="btn btn-secondary btn-sm" id="btn-add-exercise">+ 添加动作</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-text" id="btn-cancel-plan">取消</button>
+                    <button class="btn btn-primary" id="btn-save-plan">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 训练详情弹窗 -->
+        <div id="workout-detail-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="detail-modal-title">训练详情</h2>
+                    <button class="btn btn-text modal-close">&times;</button>
+                </div>
+                <div class="modal-body" id="workout-detail-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
